@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "30963187954",
+    "project_id": "up-fcm-distributor",
+    "storage_bucket": "up-fcm-distributor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30963187954:android:52027dbec92468fcd1906b",
+        "android_client_info": {
+          "package_name": "org.unifiedpush.distributor.fcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "30963187954-psvhlmlhmhmslbcnl87h6n38psci0grt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByiY3TTm62NyW_0n1c83o4AD4HxS97Vq0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "30963187954-psvhlmlhmhmslbcnl87h6n38psci0grt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
