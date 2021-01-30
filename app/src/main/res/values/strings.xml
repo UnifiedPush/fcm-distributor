@@ -6,13 +6,6 @@
     <string name="default_proxy">https://fcm.distributor.unifiedpush.org/</string>
 
     <!-- Strings used on the main page -->
-    <string name="main_about">UP-FCM Distributor is able to provide push notifications without a push provider. For this, it needs a static address even with the roaming. It is achievable with a custom network such as a VPN or the yggdrasil network.</string>
+    <string name="main_about">UP-FCM Distributor is a UnifiedPush distributor that uses FCM (Google). It doesn\'t need to be registered anywhere else.</string>
     <string name="main_applications_title">Registered applications</string>
-
-    <!-- Strings used for configuration -->
-    <string name="settings_gateway_label">Your proxy</string>
-    <string name="settings_gateway_information">This is the proxy to forward requests inside your custom network, to reach your phone from the Internet.</string>
-    <string name="settings_gateway_hint">https://proxy.example.tld</string>
-    <string name="settings_save_button">Save</string>
-    <string name="help"></string>
 </resources>

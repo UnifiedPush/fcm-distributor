@@ -2,7 +2,6 @@ package org.unifiedpush.distributor.fcm.services
 
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
 import android.util.Log
 import org.unifiedpush.distributor.fcm.R
 

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import org.unifiedpush.distributor.fcm.R
 import kotlin.concurrent.thread
 
 /**
