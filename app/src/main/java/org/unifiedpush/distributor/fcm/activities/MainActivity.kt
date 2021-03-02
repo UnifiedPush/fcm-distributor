@@ -32,7 +32,11 @@ class MainActivity : AppCompatActivity() {
     private fun setListView(){
         listView = findViewById<ListView>(R.id.applications_list)
         val db = MessagingDatabase(this)
-        var appList = db.listApps()
+        val tokenList = db.listTokens().toMutableList()
+        val appList = emptyArray<String>().toMutableList()
+        tokenList.forEach {
+            appList.add(db.getApp(it))
+        }
         db.close()
         listView.adapter = ArrayAdapter(
                 this,
@@ -46,16 +50,12 @@ class MainActivity : AppCompatActivity() {
                     alert.setTitle("Unregistering")
                     alert.setMessage("Are you sure to unregister ${appList[position]} ?")
                     alert.setPositiveButton("YES") { dialog, _ ->
-                        sendUnregistered(this,appList[position],null)
+                        sendUnregistered(this, tokenList[position])
                         val db = MessagingDatabase(this)
-                        db.forceUnregisterApp(appList[position])
-                        appList = db.listApps()
+                        db.unregisterApp(tokenList[position])
                         db.close()
-                        listView.adapter = ArrayAdapter(
-                                this,
-                                android.R.layout.simple_list_item_1,
-                                appList
-                        )
+                        tokenList.removeAt(position)
+                        appList.removeAt(position)
                         dialog.dismiss()
                     }
                     alert.setNegativeButton("NO") { dialog, _ -> dialog.dismiss() }

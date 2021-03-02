@@ -10,7 +10,10 @@ import org.unifiedpush.distributor.fcm.R
  */
 
 fun sendMessage(context: Context, token: String, message: String){
-    val application = getApp(context, token)!!
+    val application = getApp(context, token)
+    if (application.isNullOrBlank()) {
+        return
+    }
     val broadcastIntent = Intent()
     broadcastIntent.`package` = application
     broadcastIntent.action = ACTION_MESSAGE
@@ -19,8 +22,11 @@ fun sendMessage(context: Context, token: String, message: String){
     context.sendBroadcast(broadcastIntent)
 }
 
-fun sendEndpoint(context: Context, application: String, endpoint: String) {
-    val token = getToken(context,application)!!
+fun sendEndpoint(context: Context, token: String, endpoint: String) {
+    val application = getApp(context, token)
+    if (application.isNullOrBlank()) {
+        return
+    }
     val broadcastIntent = Intent()
     broadcastIntent.`package` = application
     broadcastIntent.action = ACTION_NEW_ENDPOINT
@@ -29,8 +35,11 @@ fun sendEndpoint(context: Context, application: String, endpoint: String) {
     context.sendBroadcast(broadcastIntent)
 }
 
-fun sendUnregistered(context: Context, application: String, _token: String?){
-    val token = _token?: getToken(context,application)!!
+fun sendUnregistered(context: Context, token: String) {
+    val application = getApp(context, token)
+    if (application.isNullOrBlank()) {
+        return
+    }
     val broadcastIntent = Intent()
     broadcastIntent.`package` = application
     broadcastIntent.action = ACTION_UNREGISTERED
@@ -38,7 +47,7 @@ fun sendUnregistered(context: Context, application: String, _token: String?){
     context.sendBroadcast(broadcastIntent)
 }
 
-fun sendRegistrationFailed(context: Context, application: String, token: String, message: String){
+fun sendRegistrationFailed(context: Context, application: String, token: String, message: String) {
     val broadcastIntent = Intent()
     broadcastIntent.`package` = application
     broadcastIntent.action = ACTION_REGISTRATION_FAILED
@@ -56,18 +65,6 @@ fun sendRegistrationRefused(context: Context, application: String, token: String
     context.sendBroadcast(broadcastIntent)
 }
 
-fun getToken(context: Context, application: String): String?{
-    val db = MessagingDatabase(context)
-    val token = db.getToken(application)
-    db.close()
-    return if (token.isBlank()) {
-        Log.w("notifyClient", "No token found for $application")
-        null
-    } else {
-        token
-    }
-}
-
 fun getApp(context: Context, token: String): String?{
     val db = MessagingDatabase(context)
     val app = db.getApp(token)
@@ -80,10 +77,7 @@ fun getApp(context: Context, token: String): String?{
     }
 }
 
-fun getEndpoint(context: Context, application: String): String {
-    val db = MessagingDatabase(context)
-    val appToken = db.getToken(application)
-    db.close()
+fun getEndpoint(context: Context, appToken: String): String {
     val settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE)
     val fcmToken = settings?.getString("fcmToken","")
     return context.resources.getString(R.string.default_proxy) +

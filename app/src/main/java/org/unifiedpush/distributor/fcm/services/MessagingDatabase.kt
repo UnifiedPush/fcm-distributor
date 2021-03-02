@@ -12,7 +12,7 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
     private val CREATE_TABLE_APPS = "CREATE TABLE apps (" +
             "package_name TEXT," +
             "token TEXT," +
-            "PRIMARY KEY (package_name));"
+            "PRIMARY KEY (token));"
     private val TABLE_APPS = "apps"
     private val FIELD_PACKAGE_NAME = "package_name"
     private val FIELD_TOKEN = "token"
@@ -34,10 +34,10 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         db.insert(TABLE_APPS,null,values)
     }
 
-    fun unregisterApp(packageName: String, token: String){
+    fun unregisterApp(token: String){
         val db = writableDatabase
-        val selection = "$FIELD_PACKAGE_NAME = ? AND $FIELD_TOKEN = ?"
-        val selectionArgs = arrayOf(packageName,token)
+        val selection = "$FIELD_TOKEN = ?"
+        val selectionArgs = arrayOf(token)
         db.delete(TABLE_APPS,selection,selectionArgs)
     }
 
@@ -46,23 +46,6 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         val selection = "$FIELD_PACKAGE_NAME = ?"
         val selectionArgs = arrayOf(packageName)
         db.delete(TABLE_APPS,selection,selectionArgs)
-    }
-
-    fun isRegistered(packageName: String): Boolean {
-        val db = readableDatabase
-        val selection = "$FIELD_PACKAGE_NAME = ?"
-        val selectionArgs = arrayOf(packageName)
-        return db.query(
-                TABLE_APPS,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        ).use { cursor ->
-            (cursor != null && cursor.count > 0)
-        }
     }
 
     fun strictIsRegistered(packageName: String, token: String): Boolean {
@@ -79,24 +62,6 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
                 null
         ).use { cursor ->
             (cursor != null && cursor.count > 0)
-        }
-    }
-
-    fun getToken(packageName: String): String{
-        val db = readableDatabase
-        val projection = arrayOf(FIELD_TOKEN)
-        val selection = "$FIELD_PACKAGE_NAME = ?"
-        val selectionArgs = arrayOf(packageName)
-        return db.query(
-                TABLE_APPS,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        ).use { cursor ->
-            if (cursor.moveToFirst()) cursor.getString(cursor.getColumnIndex(FIELD_TOKEN)) else ""
         }
     }
 
@@ -118,9 +83,9 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         }
     }
 
-    fun listApps(): List<String>{
+    fun listTokens(): List<String>{
         val db = readableDatabase
-        val projection = arrayOf(FIELD_PACKAGE_NAME)
+        val projection = arrayOf(FIELD_TOKEN)
         return db.query(
                 TABLE_APPS,
                 projection,
@@ -131,7 +96,7 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
                 null
         ).use{ cursor ->
             generateSequence { if (cursor.moveToNext()) cursor else null }
-                    .map{ it.getString(it.getColumnIndex(FIELD_PACKAGE_NAME)) }
+                    .map{ it.getString(it.getColumnIndex(FIELD_TOKEN)) }
                     .toList()
         }
     }

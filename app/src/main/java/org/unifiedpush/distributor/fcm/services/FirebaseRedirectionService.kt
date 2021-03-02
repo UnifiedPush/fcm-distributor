@@ -11,9 +11,9 @@ class FirebaseRedirectionService : FirebaseMessagingService() {
         val settings = baseContext.getSharedPreferences("Config", Context.MODE_PRIVATE)
         settings.edit().putString("fcmToken",token).commit()
         val db = MessagingDatabase(baseContext)
-        val appList = db.listApps()
+        val tokenList = db.listTokens()
         db.close()
-        appList.forEach{
+        tokenList.forEach{
             sendEndpoint(baseContext, it, getEndpoint(baseContext, it))
         }
     }
