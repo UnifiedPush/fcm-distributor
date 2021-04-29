@@ -79,7 +79,8 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
             null,
             null
         ).use { cursor ->
-            if (cursor.moveToFirst()) cursor.getString(cursor.getColumnIndex(FIELD_PACKAGE_NAME)) else ""
+            val column = cursor.getColumnIndex(FIELD_PACKAGE_NAME)
+            if (cursor.moveToFirst() && column >= 0) cursor.getString(column) else ""
         }
     }
 
@@ -96,7 +97,9 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
                 null
         ).use{ cursor ->
             generateSequence { if (cursor.moveToNext()) cursor else null }
-                    .map{ it.getString(it.getColumnIndex(FIELD_TOKEN)) }
+                    .mapNotNull{
+                        val column = cursor.getColumnIndex(FIELD_TOKEN)
+                        if (column >= 0) it.getString(column) else null }
                     .toList()
         }
     }
