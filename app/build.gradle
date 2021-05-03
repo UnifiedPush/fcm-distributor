@@ -38,7 +38,7 @@ android {
 
 }
 
-ext.ktor_version = '1.4.0'
+ext.ktor_version = '1.5.4'
 
 dependencies {
 
