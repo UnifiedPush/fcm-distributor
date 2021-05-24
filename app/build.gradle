@@ -52,5 +52,9 @@ dependencies {
     implementation "io.ktor:ktor:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "io.ktor:ktor-gson:$ktor_version"
-    implementation 'com.google.firebase:firebase-messaging:22.0.0'
+    implementation('com.google.firebase:firebase-messaging:22.0.0') {
+        exclude group: 'com.google.firebase', module: 'firebase-core'
+        exclude group: 'com.google.firebase', module: 'firebase-analytics'
+        exclude group: 'com.google.firebase', module: 'firebase-measurement-connector'
+    }
 }
