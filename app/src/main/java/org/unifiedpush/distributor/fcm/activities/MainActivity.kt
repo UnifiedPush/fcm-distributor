@@ -8,8 +8,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import org.unifiedpush.distributor.fcm.R
 import org.unifiedpush.distributor.fcm.services.MessagingDatabase
-import org.unifiedpush.distributor.fcm.services.sendUnregistered
-
+import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setListView(){
-        listView = findViewById<ListView>(R.id.applications_list)
+        listView = findViewById(R.id.applications_list)
         val db = MessagingDatabase(this)
         val tokenList = db.listTokens().toMutableList()
         val appList = emptyArray<String>().toMutableList()
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                 appList
         )
         listView.setOnItemLongClickListener(
-                fun(parent: AdapterView<*>, v: View, position: Int, id: Long): Boolean {
+                fun(_: AdapterView<*>, _: View, position: Int, _: Long): Boolean {
                     val alert: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(
                             this@MainActivity)
                     alert.setTitle("Unregistering")

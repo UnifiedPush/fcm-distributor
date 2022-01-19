@@ -4,59 +4,59 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
+import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
 import kotlin.concurrent.thread
 
 /**
  * THIS SERVICE IS USED BY OTHER APPS TO REGISTER
  */
 
+const val TAG = "RegisterBroadcastReceiver"
+
 class RegisterBroadcastReceiver : BroadcastReceiver() {
 
-    private fun unregisterApp(db: MessagingDatabase, application: String, token: String) {
-        // we only trust unregistered demands from the uid who registered the app
-        Log.i("RegisterService","Unregistering $application token: $token")
+    private fun unregisterApp(db: MessagingDatabase, token: String) {
+        Log.i(TAG, "Unregistering app with token: $token")
         db.unregisterApp(token)
     }
 
-    private fun registerApp(context: Context?, db: MessagingDatabase, application: String, token: String) {
+    private fun registerApp(db: MessagingDatabase, application: String, token: String) {
         if (application.isBlank()) {
-            Log.w("RegisterService","Trying to register an app without packageName")
+            Log.w(TAG, "Trying to register an app without packageName")
             return
         }
         Log.i("RegisterService","registering $application token: $token")
-        // The app is registered with the same token : we re-register it
-        // the client may need its endpoint again
-        if (db.strictIsRegistered(application, token)) {
-            Log.i("RegisterService","$application already registered : unregistering to register again")
-            unregisterApp(db,application,token)
+        if (db.isRegistered(token)) {
+            Log.i(TAG, "$application already registered")
+            return
         }
-
         db.registerApp(application, token)
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent!!.action) {
             ACTION_REGISTER ->{
-                Log.i("Register","REGISTER")
-                val token = intent.getStringExtra(EXTRA_TOKEN)?: ""
-                val application = intent.getStringExtra(EXTRA_APPLICATION)?: ""
+                //We do not check connector version, we handle all
+                Log.i(TAG, "REGISTER")
+                val token = intent.getStringExtra(EXTRA_TOKEN)?: return
+                val application = intent.getStringExtra(EXTRA_APPLICATION)?: return
                 thread(start = true) {
                     val db = MessagingDatabase(context!!)
-                    registerApp(context, db, application, token)
+                    registerApp(db, application, token)
                     db.close()
-                    Log.i("RegisterService","Registration is finished")
+                    Log.i(TAG, "Registration is finished")
                 }.join()
-                sendEndpoint(context!!, token, getEndpoint(context, token))
+                sendEndpoint(context!!, token)
             }
             ACTION_UNREGISTER ->{
-                Log.i("Register","UNREGISTER")
-                val token = intent.getStringExtra(EXTRA_TOKEN)?: ""
-                val application = intent.getStringExtra(EXTRA_APPLICATION)?: ""
+                Log.i("Register", "UNREGISTER")
+                val token = intent.getStringExtra(EXTRA_TOKEN)?: return
                 thread(start = true) {
                     val db = MessagingDatabase(context!!)
-                    unregisterApp(db,application, token)
+                    unregisterApp(db, token)
                     db.close()
-                    Log.i("RegisterService","Unregistration is finished")
+                    Log.i(TAG, "Unregistration is finished")
                 }
                 sendUnregistered(context!!, token)
             }

@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
+import org.unifiedpush.distributor.fcm.services.PushUtils.sendMessage
 
 class FirebaseRedirectionService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
@@ -14,13 +16,15 @@ class FirebaseRedirectionService : FirebaseMessagingService() {
         val tokenList = db.listTokens()
         db.close()
         tokenList.forEach{
-            sendEndpoint(baseContext, it, getEndpoint(baseContext, it))
+            sendEndpoint(baseContext, it)
         }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d("UP-FCM", "Firebase onMessageReceived ${remoteMessage.messageId}")
-        val message = remoteMessage.data["body"]!!
+        // We need to edit the gateway to get a base64 of the post data.
+        // We can do a /v2? endpoint that always send b64
+        val message = remoteMessage.data["body"]!!.toByteArray()
         val appToken = remoteMessage.data["app"]!!
         sendMessage(baseContext, appToken, message)
     }

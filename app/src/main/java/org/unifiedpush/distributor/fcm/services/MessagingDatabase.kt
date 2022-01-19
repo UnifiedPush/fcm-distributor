@@ -7,15 +7,15 @@ import android.database.sqlite.SQLiteOpenHelper
 
 private const val DB_NAME = "gotify_service"
 private const val DB_VERSION = 1
+private const val CREATE_TABLE_APPS = "CREATE TABLE apps (" +
+        "package_name TEXT," +
+        "token TEXT," +
+        "PRIMARY KEY (token));"
+private const val TABLE_APPS = "apps"
+private const val FIELD_PACKAGE_NAME = "package_name"
+private const val FIELD_TOKEN = "token"
 
 class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION){
-    private val CREATE_TABLE_APPS = "CREATE TABLE apps (" +
-            "package_name TEXT," +
-            "token TEXT," +
-            "PRIMARY KEY (token));"
-    private val TABLE_APPS = "apps"
-    private val FIELD_PACKAGE_NAME = "package_name"
-    private val FIELD_TOKEN = "token"
 
     override fun onCreate(db: SQLiteDatabase){
         db.execSQL(CREATE_TABLE_APPS)
@@ -41,17 +41,10 @@ class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         db.delete(TABLE_APPS,selection,selectionArgs)
     }
 
-    fun forceUnregisterApp(packageName: String){
-        val db = writableDatabase
-        val selection = "$FIELD_PACKAGE_NAME = ?"
-        val selectionArgs = arrayOf(packageName)
-        db.delete(TABLE_APPS,selection,selectionArgs)
-    }
-
-    fun strictIsRegistered(packageName: String, token: String): Boolean {
+    fun isRegistered(token: String): Boolean {
         val db = readableDatabase
-        val selection = "$FIELD_PACKAGE_NAME = ? AND $FIELD_TOKEN = ?"
-        val selectionArgs = arrayOf(packageName,token)
+        val selection = "$FIELD_TOKEN = ?"
+        val selectionArgs = arrayOf(token)
         return db.query(
                 TABLE_APPS,
                 null,
