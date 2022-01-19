@@ -37,6 +37,7 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent!!.action) {
             ACTION_REGISTER ->{
+                //We do not check connector version, we handle all
                 Log.i("Register","REGISTER")
                 val token = intent.getStringExtra(EXTRA_TOKEN)?: ""
                 val application = intent.getStringExtra(EXTRA_APPLICATION)?: ""

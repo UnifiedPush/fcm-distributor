@@ -20,7 +20,9 @@ class FirebaseRedirectionService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d("UP-FCM", "Firebase onMessageReceived ${remoteMessage.messageId}")
-        val message = remoteMessage.data["body"]!!
+        // We need to edit the gateway to get a base64 of the post data.
+        // We can do a /v2? endpoint that always send b64
+        val message = remoteMessage.data["body"]!!.toByteArray()
         val appToken = remoteMessage.data["app"]!!
         sendMessage(baseContext, appToken, message)
     }

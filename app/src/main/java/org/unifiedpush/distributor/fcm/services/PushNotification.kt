@@ -9,7 +9,7 @@ import org.unifiedpush.distributor.fcm.R
  * These functions are used to send messages to other apps
  */
 
-fun sendMessage(context: Context, token: String, message: String){
+fun sendMessage(context: Context, token: String, message: ByteArray) {
     val application = getApp(context, token)
     if (application.isNullOrBlank()) {
         return
@@ -18,7 +18,8 @@ fun sendMessage(context: Context, token: String, message: String){
     broadcastIntent.`package` = application
     broadcastIntent.action = ACTION_MESSAGE
     broadcastIntent.putExtra(EXTRA_TOKEN, token)
-    broadcastIntent.putExtra(EXTRA_MESSAGE, message)
+    broadcastIntent.putExtra(EXTRA_MESSAGEv1, String(message))
+    broadcastIntent.putExtra(EXTRA_MESSAGEv2, message)
     context.sendBroadcast(broadcastIntent)
 }
 
@@ -47,19 +48,13 @@ fun sendUnregistered(context: Context, token: String) {
     context.sendBroadcast(broadcastIntent)
 }
 
-fun sendRegistrationFailed(context: Context, application: String, token: String, message: String) {
+fun sendRegistrationFailed(context: Context,
+                           application: String,
+                           token: String,
+                           message: String = "") {
     val broadcastIntent = Intent()
     broadcastIntent.`package` = application
     broadcastIntent.action = ACTION_REGISTRATION_FAILED
-    broadcastIntent.putExtra(EXTRA_TOKEN, token)
-    broadcastIntent.putExtra(EXTRA_MESSAGE, message)
-    context.sendBroadcast(broadcastIntent)
-}
-
-fun sendRegistrationRefused(context: Context, application: String, token: String, message: String){
-    val broadcastIntent = Intent()
-    broadcastIntent.`package` = application
-    broadcastIntent.action = ACTION_REGISTRATION_REFUSED
     broadcastIntent.putExtra(EXTRA_TOKEN, token)
     broadcastIntent.putExtra(EXTRA_MESSAGE, message)
     context.sendBroadcast(broadcastIntent)
