@@ -66,6 +66,6 @@ object PushUtils {
         val settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE)
         val fcmToken = settings?.getString("fcmToken", "")
         return context.resources.getString(R.string.default_proxy) +
-                "/?token=$fcmToken&app=$appToken"
+                "?v2&token=$fcmToken&app=$appToken"
     }
 }
