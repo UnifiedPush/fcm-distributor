@@ -32,7 +32,7 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".services.FirebaseRedirectionService"
+            android:name=".services.FirebaseForwardingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
