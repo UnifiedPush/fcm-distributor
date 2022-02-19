@@ -12,7 +12,7 @@ import kotlin.concurrent.thread
  * THIS SERVICE IS USED BY OTHER APPS TO REGISTER
  */
 
-const val TAG = "RegisterBroadcastReceiver"
+private const val TAG = "RegisterBroadcastReceiver"
 
 class RegisterBroadcastReceiver : BroadcastReceiver() {
 
@@ -26,7 +26,7 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
             Log.w(TAG, "Trying to register an app without packageName")
             return
         }
-        Log.i("RegisterService","registering $application token: $token")
+        Log.i(TAG, "registering $application token: $token")
         if (db.isRegistered(token)) {
             Log.i(TAG, "$application already registered")
             return

@@ -9,6 +9,8 @@ import org.unifiedpush.distributor.fcm.R
  * These functions are used to send messages to other apps
  */
 
+private const val TAG = "PushUtils"
+
 object PushUtils {
     fun sendMessage(context: Context, token: String, message: ByteArray) {
         val application = getApp(context, token)
@@ -55,7 +57,7 @@ object PushUtils {
         val app = db.getApp(token)
         db.close()
         return if (app.isBlank()) {
-            Log.w("notifyClient", "No app found for $token")
+            Log.w(TAG, "No app found for $token")
             null
         } else {
             app
@@ -66,6 +68,6 @@ object PushUtils {
         val settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE)
         val fcmToken = settings?.getString("fcmToken", "")
         return context.resources.getString(R.string.default_proxy) +
-                "?v2&token=$fcmToken&app=$appToken"
+                "?v2&token=$fcmToken&instance=$appToken"
     }
 }
