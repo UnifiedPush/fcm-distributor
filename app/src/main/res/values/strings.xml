@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- Default value -->
-    <string name="default_proxy">https://fcm.distributor.unifiedpush.org/</string>
+    <string name="default_proxy">https://fcm.distributor.unifiedpush.org/FCM</string>
 
     <!-- Strings used on the main page -->
     <string name="main_about">UP-FCM Distributor is a UnifiedPush distributor that uses FCM (Google). It doesn\'t need to be registered anywhere else.</string>
