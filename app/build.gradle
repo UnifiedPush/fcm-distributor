@@ -38,6 +38,20 @@ android {
 
 }
 
+if (project.hasProperty('sign')) {
+    android {
+        signingConfigs {
+            release {
+                storeFile file(System.getenv("RELEASE_STORE_FILE"))
+                storePassword System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword System.getenv("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+    android.buildTypes.release.signingConfig android.signingConfigs.release
+}
+
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
