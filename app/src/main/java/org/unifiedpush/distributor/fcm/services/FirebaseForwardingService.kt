@@ -31,10 +31,18 @@ class FirebaseForwardingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d(TAG, "Firebase onMessageReceived ${remoteMessage.messageId}")
-        val appToken = remoteMessage.data["i"]!!
-        getMessage(remoteMessage.data)?.let { message ->
-            sendMessage(baseContext, appToken, message)
+        Log.d(TAG, "Firebase message ${remoteMessage.messageId} received")
+        remoteMessage.data["i"]?.let { appToken ->
+            getMessage(remoteMessage.data)?.let { message ->
+                sendMessage(baseContext, appToken, message)
+            }
+        } ?: run {
+            (remoteMessage.data["instance"] ?: remoteMessage.data["app"])
+                ?.let { appToken ->
+                    remoteMessage.data["body"]?.let { message ->
+                        sendMessage(baseContext, appToken, message.encodeToByteArray())
+                }
+            }
         }
     }
 
