@@ -1,6 +1,5 @@
 package org.unifiedpush.distributor.fcm.services
 
-import android.content.Context
 import android.util.Base64
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -20,8 +19,6 @@ class FirebaseForwardingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Firebase onNewToken $token")
-        val settings = baseContext.getSharedPreferences("Config", Context.MODE_PRIVATE)
-        settings.edit().putString("fcmToken",token).commit()
         val db = MessagingDatabase(baseContext)
         val tokenList = db.listTokens()
         db.close()
@@ -53,15 +50,16 @@ class FirebaseForwardingService : FirebaseMessagingService() {
                 data["s"]?.let { splitId ->
                     if (pendingMessages.containsKey(mId)) {
                         Log.d(TAG, "Found pending message")
-                        when(splitId) {
+                        message = when (splitId) {
                             "1" -> {
-                                message = Base64.decode(b64, Base64.DEFAULT) +
-                                        pendingMessages[mId]!!
+                                Base64.decode(b64, Base64.DEFAULT) +
+                                        (pendingMessages[mId] ?: ByteArray(0))
                             }
                             "2" -> {
-                                message = pendingMessages[mId]!! +
+                                (pendingMessages[mId] ?: ByteArray(0)) +
                                         Base64.decode(b64, Base64.DEFAULT)
                             }
+                            else -> ByteArray(0)
                         }
                         pendingMessages.remove(mId)
                     } else {
@@ -71,8 +69,8 @@ class FirebaseForwardingService : FirebaseMessagingService() {
                         }
                     }
                 }
-            }?:run {
-                message = Base64.decode(b64, Base64.DEFAULT)
+            } ?: run {
+                return Base64.decode(b64, Base64.DEFAULT)
             }
         }
         return message

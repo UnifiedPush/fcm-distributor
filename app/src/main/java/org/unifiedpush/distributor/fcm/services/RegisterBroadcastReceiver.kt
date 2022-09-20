@@ -34,31 +34,31 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
         db.registerApp(application, token)
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent!!.action) {
+    override fun onReceive(context: Context, intent: Intent?) {
+        when (intent?.action) {
             ACTION_REGISTER ->{
                 //We do not check connector version, we handle all
                 Log.i(TAG, "REGISTER")
                 val token = intent.getStringExtra(EXTRA_TOKEN)?: return
                 val application = intent.getStringExtra(EXTRA_APPLICATION)?: return
                 thread(start = true) {
-                    val db = MessagingDatabase(context!!)
+                    val db = MessagingDatabase(context)
                     registerApp(db, application, token)
                     db.close()
                     Log.i(TAG, "Registration is finished")
                 }.join()
-                sendEndpoint(context!!, token)
+                sendEndpoint(context, token)
             }
             ACTION_UNREGISTER ->{
                 Log.i("Register", "UNREGISTER")
                 val token = intent.getStringExtra(EXTRA_TOKEN)?: return
                 thread(start = true) {
-                    val db = MessagingDatabase(context!!)
+                    val db = MessagingDatabase(context)
                     unregisterApp(db, token)
                     db.close()
                     Log.i(TAG, "Unregistration is finished")
                 }
-                sendUnregistered(context!!, token)
+                sendUnregistered(context, token)
             }
         }
     }

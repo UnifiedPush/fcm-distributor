@@ -3,6 +3,7 @@ package org.unifiedpush.distributor.fcm.services
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 import org.unifiedpush.distributor.fcm.R
 
 /**
@@ -13,60 +14,62 @@ private const val TAG = "PushUtils"
 
 object PushUtils {
     fun sendMessage(context: Context, token: String, message: ByteArray) {
-        val application = getApp(context, token)
-        if (application.isNullOrBlank()) {
-            return
+        Intent().apply {
+            `package` = getApp(context, token) ?: return
+            action = ACTION_MESSAGE
+            putExtra(EXTRA_TOKEN, token)
+            putExtra(EXTRA_MESSAGE, String(message))
+            putExtra(EXTRA_BYTES_MESSAGE, message)
+        }.let { intent ->
+            context.sendBroadcast(intent)
         }
-        val broadcastIntent = Intent()
-        broadcastIntent.`package` = application
-        broadcastIntent.action = ACTION_MESSAGE
-        broadcastIntent.putExtra(EXTRA_TOKEN, token)
-        broadcastIntent.putExtra(EXTRA_MESSAGE, String(message))
-        broadcastIntent.putExtra(EXTRA_BYTES_MESSAGE, message)
-        context.sendBroadcast(broadcastIntent)
     }
 
     fun sendEndpoint(context: Context, token: String) {
-        val application = getApp(context, token)
-        val endpoint = getEndpoint(context, token)
-        if (application.isNullOrBlank()) {
-            return
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG, "FcmToken successfully received")
+                task.result
+            } else {
+                Log.w(
+                    TAG, "FCMToken registration failed: " +
+                            "${task.exception?.localizedMessage}"
+                )
+                null
+            }?.let { fcmToken ->
+                Intent().apply {
+                    `package` = getApp(context, token) ?: return@addOnCompleteListener
+                    action = ACTION_NEW_ENDPOINT
+                    putExtra(EXTRA_TOKEN, token)
+                    putExtra(EXTRA_ENDPOINT, getEndpoint(context, fcmToken, token))
+                }.let { intent ->
+                    context.sendBroadcast(intent)
+                }
+            }
         }
-        val broadcastIntent = Intent()
-        broadcastIntent.`package` = application
-        broadcastIntent.action = ACTION_NEW_ENDPOINT
-        broadcastIntent.putExtra(EXTRA_TOKEN, token)
-        broadcastIntent.putExtra(EXTRA_ENDPOINT, endpoint)
-        context.sendBroadcast(broadcastIntent)
     }
 
     fun sendUnregistered(context: Context, token: String) {
-        val application = getApp(context, token)
-        if (application.isNullOrBlank()) {
-            return
+        Intent().apply {
+            `package` = getApp(context, token) ?: return
+            action = ACTION_UNREGISTERED
+            putExtra(EXTRA_TOKEN, token)
+        }.let { intent ->
+            context.sendBroadcast(intent)
         }
-        val broadcastIntent = Intent()
-        broadcastIntent.`package` = application
-        broadcastIntent.action = ACTION_UNREGISTERED
-        broadcastIntent.putExtra(EXTRA_TOKEN, token)
-        context.sendBroadcast(broadcastIntent)
     }
 
     private fun getApp(context: Context, token: String): String? {
         val db = MessagingDatabase(context)
         val app = db.getApp(token)
         db.close()
-        return if (app.isBlank()) {
+        return app.ifBlank {
             Log.w(TAG, "No app found for $token")
             null
-        } else {
-            app
         }
     }
 
-    private fun getEndpoint(context: Context, appToken: String): String {
-        val settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE)
-        val fcmToken = settings?.getString("fcmToken", "")
+    private fun getEndpoint(context: Context, fcmToken: String, appToken: String): String {
         return context.resources.getString(R.string.default_proxy) +
                 "?v2&token=$fcmToken&instance=$appToken"
     }
