@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import org.unifiedpush.distributor.fcm.R
+import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
 
 /**
  * These functions are used to send messages to other apps
@@ -60,9 +61,7 @@ object PushUtils {
     }
 
     private fun getApp(context: Context, token: String): String? {
-        val db = MessagingDatabase(context)
-        val app = db.getApp(token)
-        db.close()
+        val app = getDb(context).getApp(token)
         return app.ifBlank {
             Log.w(TAG, "No app found for $token")
             null

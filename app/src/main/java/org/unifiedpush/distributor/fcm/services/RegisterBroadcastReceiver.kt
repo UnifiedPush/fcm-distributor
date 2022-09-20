@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
 import kotlin.concurrent.thread
@@ -42,9 +43,7 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
                 val token = intent.getStringExtra(EXTRA_TOKEN)?: return
                 val application = intent.getStringExtra(EXTRA_APPLICATION)?: return
                 thread(start = true) {
-                    val db = MessagingDatabase(context)
-                    registerApp(db, application, token)
-                    db.close()
+                    registerApp(getDb(context), application, token)
                     Log.i(TAG, "Registration is finished")
                 }.join()
                 sendEndpoint(context, token)
@@ -53,9 +52,7 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
                 Log.i("Register", "UNREGISTER")
                 val token = intent.getStringExtra(EXTRA_TOKEN)?: return
                 thread(start = true) {
-                    val db = MessagingDatabase(context)
-                    unregisterApp(db, token)
-                    db.close()
+                    unregisterApp(getDb(context), token)
                     Log.i(TAG, "Unregistration is finished")
                 }
                 sendUnregistered(context, token)

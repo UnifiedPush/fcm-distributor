@@ -7,15 +7,25 @@ import android.database.sqlite.SQLiteOpenHelper
 
 private const val DB_NAME = "gotify_service"
 private const val DB_VERSION = 1
-private const val CREATE_TABLE_APPS = "CREATE TABLE apps (" +
-        "package_name TEXT," +
-        "token TEXT," +
-        "PRIMARY KEY (token));"
+private const val CREATE_TABLE_APPS =
+    "CREATE TABLE apps (package_name TEXT,token TEXT,PRIMARY KEY (token));"
 private const val TABLE_APPS = "apps"
 private const val FIELD_PACKAGE_NAME = "package_name"
 private const val FIELD_TOKEN = "token"
 
-class MessagingDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION){
+class MessagingDatabase(context: Context)
+    : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION){
+
+    companion object {
+        private lateinit var db: MessagingDatabase
+
+        fun getDb(context: Context): MessagingDatabase {
+            if (!this::db.isInitialized) {
+                db = MessagingDatabase(context)
+            }
+            return db
+        }
+    }
 
     override fun onCreate(db: SQLiteDatabase){
         db.execSQL(CREATE_TABLE_APPS)

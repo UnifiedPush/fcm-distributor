@@ -4,6 +4,7 @@ import android.util.Base64
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendMessage
 import java.util.Timer
@@ -19,10 +20,7 @@ class FirebaseForwardingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Firebase onNewToken $token")
-        val db = MessagingDatabase(baseContext)
-        val tokenList = db.listTokens()
-        db.close()
-        tokenList.forEach{
+        getDb(baseContext).listTokens().forEach{
             sendEndpoint(baseContext, it)
         }
     }

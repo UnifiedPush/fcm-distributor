@@ -7,7 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import org.unifiedpush.distributor.fcm.R
-import org.unifiedpush.distributor.fcm.services.MessagingDatabase
+import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
 
 class MainActivity : AppCompatActivity() {
@@ -30,13 +30,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setListView(){
         listView = findViewById(R.id.applications_list)
-        val db = MessagingDatabase(this)
+        val db = getDb(this)
         val tokenList = db.listTokens().toMutableList()
-        val appList = emptyArray<String>().toMutableList()
-        tokenList.forEach {
-            appList.add(db.getApp(it))
-        }
-        db.close()
+        val appList = db.listTokens().map {
+            db.getApp(it)
+        } as MutableList
         listView.adapter = ArrayAdapter(
                 this,
                 android.R.layout.simple_list_item_1,
@@ -45,14 +43,12 @@ class MainActivity : AppCompatActivity() {
         listView.setOnItemLongClickListener(
                 fun(_: AdapterView<*>, _: View, position: Int, _: Long): Boolean {
                     val alert: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(
-                            this@MainActivity)
+                            this)
                     alert.setTitle("Unregistering")
                     alert.setMessage("Are you sure to unregister ${appList[position]} ?")
                     alert.setPositiveButton("YES") { dialog, _ ->
                         sendUnregistered(this, tokenList[position])
-                        val db = MessagingDatabase(this)
                         db.unregisterApp(tokenList[position])
-                        db.close()
                         tokenList.removeAt(position)
                         appList.removeAt(position)
                         dialog.dismiss()
