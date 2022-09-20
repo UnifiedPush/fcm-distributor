@@ -5,10 +5,10 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-private const val DB_NAME = "gotify_service"
+private const val DB_NAME = "unifiedpush"
 private const val DB_VERSION = 1
 private const val CREATE_TABLE_APPS =
-    "CREATE TABLE apps (package_name TEXT,token TEXT,PRIMARY KEY (token));"
+    "CREATE TABLE apps (package_name TEXT, token TEXT, PRIMARY KEY (token));"
 private const val TABLE_APPS = "apps"
 private const val FIELD_PACKAGE_NAME = "package_name"
 private const val FIELD_TOKEN = "token"
@@ -21,9 +21,29 @@ class MessagingDatabase(context: Context)
 
         fun getDb(context: Context): MessagingDatabase {
             if (!this::db.isInitialized) {
+                checkAndRenameDatabase(context, "gotify_service", DB_NAME)
                 db = MessagingDatabase(context)
             }
             return db
+        }
+
+        private fun checkAndRenameDatabase(context: Context, oldName: String, newName: String) {
+            val oldDatabaseFile = context.getDatabasePath(oldName)
+            if(oldDatabaseFile.exists()) {
+                val newDatabaseFile = context.getDatabasePath(newName)
+
+                if(oldDatabaseFile.exists()) {
+                    if(newDatabaseFile.exists()) {
+                        newDatabaseFile.delete()
+                    }
+                    oldDatabaseFile.renameTo(newDatabaseFile)
+                }
+                context.getDatabasePath("$oldName-journal").let {
+                    if (it.exists()) {
+                        it.delete()
+                    }
+                }
+            }
         }
     }
 
