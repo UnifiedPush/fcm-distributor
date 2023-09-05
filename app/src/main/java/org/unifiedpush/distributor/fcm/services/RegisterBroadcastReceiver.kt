@@ -7,6 +7,8 @@ import android.util.Log
 import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
+import java.util.Timer
+import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 
 /**
@@ -40,23 +42,63 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
             ACTION_REGISTER ->{
                 //We do not check connector version, we handle all
                 Log.i(TAG, "REGISTER")
-                val token = intent.getStringExtra(EXTRA_TOKEN)?: return
+                val connectorToken = intent.getStringExtra(EXTRA_TOKEN)?: return
                 val application = intent.getStringExtra(EXTRA_APPLICATION)?: return
-                thread(start = true) {
-                    registerApp(getDb(context), application, token)
-                    Log.i(TAG, "Registration is finished")
-                }.join()
-                sendEndpoint(context, token)
+                if (!createQueue.containsTokenElseAdd(connectorToken)) {
+                    thread(start = true) {
+                        registerApp(getDb(context), application, connectorToken)
+                        Log.i(TAG, "Registration is finished")
+                        sendEndpoint(context, connectorToken)
+                        createQueue.removeToken(connectorToken)
+                    }.join()
+                } else {
+                    Log.d(TAG, "Already registering this token")
+                }
             }
             ACTION_UNREGISTER ->{
                 Log.i("Register", "UNREGISTER")
-                val token = intent.getStringExtra(EXTRA_TOKEN)?: return
-                thread(start = true) {
-                    unregisterApp(getDb(context), token)
-                    Log.i(TAG, "Unregistration is finished")
+                val connectorToken = intent.getStringExtra(EXTRA_TOKEN)?: return
+                if (!delQueue.containsTokenElseAdd(connectorToken)) {
+                    thread(start = true) {
+                        unregisterApp(getDb(context), connectorToken)
+                        Log.i(TAG, "Unregistration is finished")
+                        sendUnregistered(context, connectorToken)
+                        delQueue.removeToken(connectorToken)
+                    }
+                } else {
+                    Log.d(TAG, "Already deleting this token")
                 }
-                sendUnregistered(context, token)
             }
         }
+    }
+
+    private fun MutableList<String>.containsTokenElseAdd(connectorToken: String): Boolean {
+        return synchronized(this) {
+            if (connectorToken !in this) {
+                Log.d(TAG, "Token: $this")
+                this.add(connectorToken)
+                delayRemove(this, connectorToken)
+                false
+            } else {
+                true
+            }
+        }
+    }
+
+    private fun MutableList<String>.removeToken(connectorToken: String) {
+        synchronized(this) {
+            this.remove(connectorToken)
+        }
+    }
+
+    private fun delayRemove(list: MutableList<String>, token: String) {
+        Timer().schedule(1_000L /* 1sec */) {
+            list.removeToken(token)
+        }
+    }
+
+    companion object {
+        private val createQueue = emptyList<String>().toMutableList()
+        private val delQueue = emptyList<String>().toMutableList()
     }
 }
