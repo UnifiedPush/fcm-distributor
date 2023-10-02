@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
 import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
+import org.unifiedpush.distributor.fcm.utils.getApplicationName
 import java.util.Timer
 import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
@@ -37,7 +39,8 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
         db.registerApp(application, token)
     }
 
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(rContext: Context, intent: Intent?) {
+        val context = rContext.applicationContext
         when (intent?.action) {
             ACTION_REGISTER ->{
                 //We do not check connector version, we handle all
@@ -51,6 +54,8 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
                         sendEndpoint(context, connectorToken)
                         createQueue.removeToken(connectorToken)
                     }.join()
+                    val appName = context.getApplicationName(application) ?: application
+                    Toast.makeText(context, "$appName registered.", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.d(TAG, "Already registering this token")
                 }

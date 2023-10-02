@@ -1,10 +1,13 @@
 package org.unifiedpush.distributor.fcm.activities
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import org.unifiedpush.distributor.fcm.R
 import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
@@ -19,6 +22,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
         setListView()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { /*granted ->*/
+            }.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
