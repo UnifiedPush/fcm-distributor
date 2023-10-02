@@ -5,9 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
-import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
-import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
+import org.unifiedpush.distributor.fcm.Database
+import org.unifiedpush.distributor.fcm.Database.Companion.getDb
+import org.unifiedpush.distributor.fcm.distributor.Distributor.sendEndpoint
+import org.unifiedpush.distributor.fcm.distributor.Distributor.sendUnregistered
+import org.unifiedpush.distributor.fcm.distributor.ACTION_REGISTER
+import org.unifiedpush.distributor.fcm.distributor.ACTION_UNREGISTER
+import org.unifiedpush.distributor.fcm.distributor.EXTRA_APPLICATION
+import org.unifiedpush.distributor.fcm.distributor.EXTRA_TOKEN
 import org.unifiedpush.distributor.fcm.utils.getApplicationName
 import java.util.Timer
 import kotlin.concurrent.schedule
@@ -21,12 +26,12 @@ private const val TAG = "RegisterBroadcastReceiver"
 
 class RegisterBroadcastReceiver : BroadcastReceiver() {
 
-    private fun unregisterApp(db: MessagingDatabase, token: String) {
+    private fun unregisterApp(db: Database, token: String) {
         Log.i(TAG, "Unregistering app with token: $token")
         db.unregisterApp(token)
     }
 
-    private fun registerApp(db: MessagingDatabase, application: String, token: String) {
+    private fun registerApp(db: Database, application: String, token: String) {
         if (application.isBlank()) {
             Log.w(TAG, "Trying to register an app without packageName")
             return

@@ -10,8 +10,8 @@ import android.widget.ListView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import org.unifiedpush.distributor.fcm.R
-import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
-import org.unifiedpush.distributor.fcm.services.PushUtils.sendUnregistered
+import org.unifiedpush.distributor.fcm.Database.Companion.getDb
+import org.unifiedpush.distributor.fcm.distributor.Distributor.sendUnregistered
 
 class MainActivity : AppCompatActivity() {
 

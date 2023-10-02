@@ -1,19 +1,16 @@
-package org.unifiedpush.distributor.fcm.services
+package org.unifiedpush.distributor.fcm.distributor
 
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import org.unifiedpush.distributor.fcm.R
-import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
+import org.unifiedpush.distributor.fcm.Database
 
-/**
- * These functions are used to send messages to other apps
- */
+object Distributor {
 
-private const val TAG = "PushUtils"
+    private const val TAG = "Distributor"
 
-object PushUtils {
     fun sendMessage(context: Context, token: String, message: ByteArray) {
         Intent().apply {
             `package` = getApp(context, token) ?: return
@@ -61,7 +58,7 @@ object PushUtils {
     }
 
     private fun getApp(context: Context, token: String): String? {
-        val app = getDb(context).getApp(token)
+        val app = Database.getDb(context).getApp(token)
         return app.ifBlank {
             Log.w(TAG, "No app found for $token")
             null

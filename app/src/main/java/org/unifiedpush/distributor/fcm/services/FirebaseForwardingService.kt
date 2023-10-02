@@ -4,9 +4,9 @@ import android.util.Base64
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.unifiedpush.distributor.fcm.services.MessagingDatabase.Companion.getDb
-import org.unifiedpush.distributor.fcm.services.PushUtils.sendEndpoint
-import org.unifiedpush.distributor.fcm.services.PushUtils.sendMessage
+import org.unifiedpush.distributor.fcm.Database.Companion.getDb
+import org.unifiedpush.distributor.fcm.distributor.Distributor.sendEndpoint
+import org.unifiedpush.distributor.fcm.distributor.Distributor.sendMessage
 import java.util.Timer
 import kotlin.concurrent.schedule
 

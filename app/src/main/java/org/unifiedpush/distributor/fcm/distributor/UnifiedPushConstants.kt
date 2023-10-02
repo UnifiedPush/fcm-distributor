@@ -1,4 +1,4 @@
-package org.unifiedpush.distributor.fcm.services
+package org.unifiedpush.distributor.fcm.distributor
 
 /**
  * Constants as defined on the specs
