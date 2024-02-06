@@ -31,17 +31,19 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
         db.unregisterApp(token)
     }
 
-    private fun registerApp(db: Database, application: String, token: String) {
+    // Returns true if it register a new app
+    private fun registerApp(db: Database, application: String, token: String): Boolean {
         if (application.isBlank()) {
             Log.w(TAG, "Trying to register an app without packageName")
-            return
+            return false
         }
         Log.i(TAG, "registering $application token: $token")
         if (db.isRegistered(token)) {
             Log.i(TAG, "$application already registered")
-            return
+            return false
         }
         db.registerApp(application, token)
+        return true
     }
 
     override fun onReceive(rContext: Context, intent: Intent?) {
@@ -53,14 +55,18 @@ class RegisterBroadcastReceiver : BroadcastReceiver() {
                 val connectorToken = intent.getStringExtra(EXTRA_TOKEN)?: return
                 val application = intent.getStringExtra(EXTRA_APPLICATION)?: return
                 if (!createQueue.containsTokenElseAdd(connectorToken)) {
+                    var toast = false
                     thread(start = true) {
-                        registerApp(getDb(context), application, connectorToken)
+                        toast = registerApp(getDb(context), application, connectorToken)
                         Log.i(TAG, "Registration is finished")
                         sendEndpoint(context, connectorToken)
                         createQueue.removeToken(connectorToken)
                     }.join()
-                    val appName = context.getApplicationName(application) ?: application
-                    Toast.makeText(context, "$appName registered.", Toast.LENGTH_SHORT).show()
+                    if (toast) {
+                        val appName = context.getApplicationName(application) ?: application
+                        Toast.makeText(context, "$appName registered.", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 } else {
                     Log.d(TAG, "Already registering this token")
                 }
