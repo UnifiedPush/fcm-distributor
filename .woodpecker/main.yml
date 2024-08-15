@@ -34,5 +34,4 @@ steps:
                 from_secret: codeberg_token
             file:
                 - fcm-distributor.apk
-            fastlane: true
             package: true
