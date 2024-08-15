@@ -19,7 +19,7 @@ steps:
           - export RELEASE_STORE_FILE=$PWD/release-key.jks
           - echo $RELEASE_KEY | base64 -d > $RELEASE_STORE_FILE
           - ./gradlew -Psign assembleRelease --stacktrace
-          - mv app/build/outputs/apk/releas/app-releas.apk fcm-distributor.apk
+          - mv app/build/outputs/apk/release/app-release.apk fcm-distributor.apk
         environment:
           - RELEASE_KEY_ALIAS=unifiedpush
         secrets: [ release_key, release_store_password, release_key_password ]
