@@ -1,0 +1,38 @@
+steps:
+    check:
+        # https://github.com/MobileDevOps/android-sdk-image
+        image: mobiledevops/android-sdk-image:latest
+        when:
+          branch: main
+          event: [push, pull_request, manual]
+        commands:
+          - ./gradlew build --stacktrace
+          - mv app/build/outputs/apk/debug/app-debug.apk fcm-distributor.apk
+
+    build:
+        # https://github.com/MobileDevOps/android-sdk-image
+        image: mobiledevops/android-sdk-image:latest
+        when:
+          branch: main
+          event: tag
+        commands:
+          - export RELEASE_STORE_FILE=$PWD/release-key.jks
+          - echo $RELEASE_KEY | base64 -d > $RELEASE_STORE_FILE
+          - ./gradlew -Psign assembleRelease --stacktrace
+          - mv app/build/outputs/apk/releas/app-releas.apk fcm-distributor.apk
+        environment:
+          - RELEASE_KEY_ALIAS=unifiedpush
+        secrets: [ release_key, release_store_password, release_key_password ]
+
+    upload:
+        image: codeberg.org/s1m/woodpecker-upload:latest
+        when:
+            branch: main
+            event: [push, pull_request, tag, manual]
+        settings:
+            token:
+                from_secret: codeberg_token
+            file:
+                - fcm-distributor.apk
+            fastlane: true
+            package: true
