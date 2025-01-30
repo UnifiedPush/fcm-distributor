@@ -12,7 +12,6 @@ import org.unifiedpush.distributor.fcm.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBarUi() {
-
     TopAppBar(
         colors = TopAppBarDefaults
             .topAppBarColors(
@@ -23,7 +22,6 @@ fun AppBarUi() {
             Text(
                 stringResource(R.string.app_name)
             )
-        },
+        }
     )
-
 }

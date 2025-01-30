@@ -16,7 +16,7 @@ class Migrations(context: Context) : MigrationFactory(context, PREF_NAME) {
      *
      * Migrate database to unifiedpush lib one
      */
-    object Migration020000: Migration {
+    object Migration020000 : Migration {
         override val version = 20000
 
         override fun run(context: Context) {

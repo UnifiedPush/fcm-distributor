@@ -28,7 +28,6 @@ class MainNotificationData(
     activity = MainActivity::class.java
 )
 
-
 class ForegroundNotification(context: Context) : AppNotification(
     context,
     Notifications.ignoreShown,

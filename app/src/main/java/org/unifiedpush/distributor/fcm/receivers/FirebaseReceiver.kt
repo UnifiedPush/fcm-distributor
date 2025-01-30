@@ -4,16 +4,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import org.unifiedpush.distributor.fcm.utils.TAG
 import org.unifiedpush.distributor.fcm.ACTION_FCM_RECEIVE
 import org.unifiedpush.distributor.fcm.ACTION_FCM_REGISTRATION
 import org.unifiedpush.distributor.fcm.DatabaseFactory
 import org.unifiedpush.distributor.fcm.Distributor
-import org.unifiedpush.distributor.fcm.GGL_ENDPOINT
 import org.unifiedpush.distributor.fcm.EXTRA_RAW_DATA
 import org.unifiedpush.distributor.fcm.EXTRA_REGISTRATION_ID
 import org.unifiedpush.distributor.fcm.EXTRA_SUBTYPE
 import org.unifiedpush.distributor.fcm.GATEWAY_ENDPOINT
+import org.unifiedpush.distributor.fcm.GGL_ENDPOINT
+import org.unifiedpush.distributor.fcm.utils.TAG
 
 /**
  * This receivers interacts with Google Services and receives FCM message. It is exposed by the library.
@@ -60,7 +60,7 @@ class FirebaseReceiver : BroadcastReceiver() {
                     }
                 } ?: return
                 val message = intent.getByteArrayExtra(EXTRA_RAW_DATA) ?: return
-                //val messageId = intent.getStringExtra(EXTRA_GOOGLE_MSG_ID)
+                // val messageId = intent.getStringExtra(EXTRA_GOOGLE_MSG_ID)
                 Distributor.sendMessage(context, channelId, message)
             }
         }
@@ -75,5 +75,4 @@ class FirebaseReceiver : BroadcastReceiver() {
         DatabaseFactory.getDb(context).saveEndpoint(channelId, endpoint)
         Distributor.sendEndpointForChannel(context, channelId)
     }
-
 }

@@ -3,9 +3,9 @@ package org.unifiedpush.distributor.fcm
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import org.unifiedpush.distributor.ChannelCreationStatus
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import org.unifiedpush.distributor.ChannelCreationStatus
 import org.unifiedpush.distributor.Database
 import org.unifiedpush.distributor.UnifiedPushDistributor
 

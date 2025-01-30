@@ -3,9 +3,9 @@
 package org.unifiedpush.distributor.fcm.receivers
 
 import android.content.Context
-import org.unifiedpush.distributor.receiver.DistributorReceiver
 import org.unifiedpush.distributor.fcm.Distributor
 import org.unifiedpush.distributor.fcm.callback.NetworkCallbackFactory
+import org.unifiedpush.distributor.receiver.DistributorReceiver
 
 /**
  * THIS SERVICE IS USED BY OTHER APPS TO REGISTER

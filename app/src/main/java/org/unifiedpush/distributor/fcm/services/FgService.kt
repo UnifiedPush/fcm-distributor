@@ -3,13 +3,13 @@ package org.unifiedpush.distributor.fcm.services
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AtomicReference
-import org.unifiedpush.distributor.service.ForegroundService
-import org.unifiedpush.distributor.service.ForegroundServiceFactory
 import org.unifiedpush.distributor.fcm.callback.BatteryCallbackFactory
 import org.unifiedpush.distributor.fcm.callback.NetworkCallbackFactory
 import org.unifiedpush.distributor.fcm.utils.ForegroundNotification
 import org.unifiedpush.distributor.fcm.utils.NOTIFICATION_ID_FOREGROUND
 import org.unifiedpush.distributor.fcm.utils.TAG
+import org.unifiedpush.distributor.service.ForegroundService
+import org.unifiedpush.distributor.service.ForegroundServiceFactory
 
 class FgService : ForegroundService() {
 

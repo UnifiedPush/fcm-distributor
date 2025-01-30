@@ -4,8 +4,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class OldDatabase(context: Context)
-        : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+class OldDatabase(context: Context) :
+    SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
 
     data class OldRecord(
         val packageName: String,

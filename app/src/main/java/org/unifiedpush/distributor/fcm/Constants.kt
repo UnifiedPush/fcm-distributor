@@ -1,13 +1,11 @@
 package org.unifiedpush.distributor.fcm
 
-
 /*
  * FCM Related constants
  */
 internal const val GGL_ENDPOINT = "https://fcm.googleapis.com/fcm/send/%s"
 internal const val GATEWAY_ENDPOINT = "https://fcm.distributor.unifiedpush.org/wpfcm?t=%s"
 internal const val GATEWAY_VAPID_KEY = "BHNcG_luRWfsMIh1z2YxTNWlWHSMMciR8C3R1fwCdahG2zrnc3DRUltqtohzsiSRyUWsP7euJMxZ6Agb8lxBcHk"
-
 
 internal const val GSF_PACKAGE = "com.google.android.gms"
 
