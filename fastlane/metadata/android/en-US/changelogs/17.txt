@@ -1,0 +1,5 @@
+- New User Interface
+- Follow last UnifiedPush specifications
+- Now fully FOSS: Remove firebase-message from dependencies
+- Do not use any gateway for registrations with VAPID key
+- Adds a foreground service to be able to raise target app to the foreground
