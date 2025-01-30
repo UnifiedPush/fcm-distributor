@@ -1,73 +1,74 @@
 package org.unifiedpush.distributor.fcm.activities
 
-import android.Manifest
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import org.unifiedpush.distributor.fcm.R
-import org.unifiedpush.distributor.fcm.Database.Companion.getDb
-import org.unifiedpush.distributor.fcm.distributor.Distributor.sendUnregistered
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.unifiedpush.distributor.fcm.EventBus
+import org.unifiedpush.distributor.fcm.Migrations
+import org.unifiedpush.distributor.fcm.activities.ui.MainUi
+import org.unifiedpush.distributor.fcm.activities.ui.theme.AppTheme
+import org.unifiedpush.distributor.fcm.services.RestartWorker
+import org.unifiedpush.distributor.fcm.utils.TAG
 
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var listView : ListView
+class MainActivity : ComponentActivity() {
+    private var viewModel: MainViewModel? = null
+    private var jobs: MutableList<Job> = emptyList<Job>().toMutableList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
-        setListView()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { /*granted ->*/
-            }.launch(
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-        }
-    }
+        RestartWorker.startPeriodic(this)
+        Migrations(this).run()
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if(hasFocus) {
-            setListView()
-        }
-    }
-
-    private fun setListView(){
-        listView = findViewById(R.id.applications_list)
-        val db = getDb(this)
-        val tokenList = db.listTokens().toMutableList()
-        val appList = db.listTokens().map {
-            db.getApp(it)
-        } as MutableList
-        listView.adapter = ArrayAdapter(
-                this,
-                android.R.layout.simple_list_item_1,
-                appList
-        )
-        listView.setOnItemLongClickListener(
-                fun(_: AdapterView<*>, _: View, position: Int, _: Long): Boolean {
-                    val alert: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(
-                            this)
-                    alert.setTitle("Unregistering")
-                    alert.setMessage("Are you sure to unregister ${appList[position]} ?")
-                    alert.setPositiveButton("YES") { dialog, _ ->
-                        sendUnregistered(this, tokenList[position])
-                        db.unregisterApp(tokenList[position])
-                        tokenList.removeAt(position)
-                        appList.removeAt(position)
-                        dialog.dismiss()
-                    }
-                    alert.setNegativeButton("NO") { dialog, _ -> dialog.dismiss() }
-                    alert.show()
-                    return true
+        setContent {
+            val viewModel =
+                viewModel {
+                    MainViewModel(this@MainActivity)
+                }.also {
+                    viewModel = it
                 }
-        )
+            AppTheme {
+                MainUi(viewModel)
+            }
+            subscribeActions()
+        }
+    }
+
+    private fun subscribeActions() {
+        Log.d(TAG, "Subscribing to actions")
+        jobs += CoroutineScope(Dispatchers.IO).launch {
+            EventBus.subscribe<AppAction> { it.handle(this@MainActivity) }
+        }
+        jobs += CoroutineScope(Dispatchers.IO).launch {
+            EventBus.subscribe<UiAction> {
+                it.handle { type ->
+                    when (type) {
+                        UiAction.Action.RefreshRegistrations -> viewModel?.refreshRegistrations(
+                            this@MainActivity
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "Resumed")
+        viewModel?.refreshRegistrations(this)
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "Destroy")
+        jobs.removeAll {
+            it.cancel()
+            true
+        }
+        super.onDestroy()
     }
 }

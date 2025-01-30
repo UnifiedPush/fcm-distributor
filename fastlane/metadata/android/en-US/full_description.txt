@@ -1,0 +1,5 @@
+UnifiedPush provider using Google Services
+
+This application is a service to provide push notifications to applications supporting UnifiedPush.
+
+More information about UnifiedPush at https://unifiedpush.org .

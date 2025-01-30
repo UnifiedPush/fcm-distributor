@@ -1,17 +1,14 @@
 steps:
     check:
-        # https://github.com/MobileDevOps/android-sdk-image
-        image: mobiledevops/android-sdk-image:latest
+        image: runmymind/docker-android-sdk:latest
         when:
           branch: main
-          event: [push, pull_request, manual]
+          event: [push, pull_request]
         commands:
-          - ./gradlew build --stacktrace
-          - mv app/build/outputs/apk/debug/app-debug.apk fcm-distributor.apk
+          - ./gradlew assembleRelease ktlintCheck --stacktrace
 
     build:
-        # https://github.com/MobileDevOps/android-sdk-image
-        image: mobiledevops/android-sdk-image:latest
+        image: runmymind/docker-android-sdk:latest
         when:
           branch: main
           event: tag
@@ -19,19 +16,24 @@ steps:
           - export RELEASE_STORE_FILE=$PWD/release-key.jks
           - echo $RELEASE_KEY | base64 -d > $RELEASE_STORE_FILE
           - ./gradlew -Psign assembleRelease --stacktrace
-          - mv app/build/outputs/apk/release/app-release.apk fcm-distributor.apk
+          - mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/fcm-distributor.apk
         environment:
-          - RELEASE_KEY_ALIAS=unifiedpush
-        secrets: [ release_key, release_store_password, release_key_password ]
+          RELEASE_KEY_ALIAS: unifiedpush
+          RELEASE_KEY:
+            from_secret: release_key
+          RELEASE_STORE_PASSWORD:
+            from_secret: release_store_password
+          RELEASE_KEY_PASSWORD:
+            from_secret: release_key_password
 
     upload:
         image: codeberg.org/s1m/woodpecker-upload:latest
         when:
             branch: main
-            event: [push, pull_request, tag, manual]
+            event: tag
         settings:
             token:
                 from_secret: codeberg_token
-            file:
-                - fcm-distributor.apk
-            package: true
+            file: app/build/outputs/apk/fcm-distributor.apk
+            fastlane: true
+
