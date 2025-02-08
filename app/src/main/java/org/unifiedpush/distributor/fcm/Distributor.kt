@@ -31,10 +31,12 @@ object Distributor : UnifiedPushDistributor() {
         val vapid = vapid ?: GATEWAY_VAPID_KEY
         registerFCM(context, channelId, vapid, useGateway)
         // We call the callback even without the endpoint, it will send the REGISTER later
-        callback(ChannelCreationStatus.Ok(
-            channelId = channelId,
-            sendEndpoint = false
-        ))
+        callback(
+            ChannelCreationStatus.Ok(
+                channelId = channelId,
+                sendEndpoint = false
+            )
+        )
     }
 
     override fun unregisterChannelIdToServer(context: Context, appToken: String, callback: (Boolean) -> Unit) {
