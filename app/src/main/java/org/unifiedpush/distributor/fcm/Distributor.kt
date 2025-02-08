@@ -17,8 +17,6 @@ object Distributor : UnifiedPushDistributor() {
         return DatabaseFactory.getDb(context)
     }
 
-    override val newChannelSuccess = ChannelCreationStatus.OK_WAIT
-
     @OptIn(ExperimentalUuidApi::class)
     override fun registerChannelIdToServer(
         context: Context,
@@ -26,14 +24,17 @@ object Distributor : UnifiedPushDistributor() {
         channelId: String?,
         title: String?,
         vapid: String?,
-        callback: (String?) -> Unit
+        callback: (ChannelCreationStatus) -> Unit
     ) {
         val channelId = channelId ?: Uuid.random().toString()
         val useGateway = vapid == null
         val vapid = vapid ?: GATEWAY_VAPID_KEY
         registerFCM(context, channelId, vapid, useGateway)
         // We call the callback even without the endpoint, it will send the REGISTER later
-        callback(channelId)
+        callback(ChannelCreationStatus.Ok(
+            channelId = channelId,
+            sendEndpoint = false
+        ))
     }
 
     override fun unregisterChannelIdToServer(context: Context, appToken: String, callback: (Boolean) -> Unit) {

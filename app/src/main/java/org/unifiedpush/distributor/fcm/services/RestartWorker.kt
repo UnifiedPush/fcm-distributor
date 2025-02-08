@@ -23,5 +23,9 @@ class RestartWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params
             // a uaid yet, it will be created during the initial sync
             return true
         }
+
+        override fun isServiceStarted(context: Context): Boolean {
+            return FgService.isServiceStarted()
+        }
     }
 }
