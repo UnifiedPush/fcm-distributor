@@ -1,0 +1,1 @@
+Dies ist ein <a href='https://unifiedpush.org/'>UnifiedPush</a>-Distributor, der <a href='https://en.wikipedia.org/wiki/Firebase_Cloud_Messaging'>FCM</a> („Firebase Cloud Messaging“ aka „Google Cloud Messaging“) verwendet. Es funktioniert sofort, Sie müssen keinen Server angeben.
