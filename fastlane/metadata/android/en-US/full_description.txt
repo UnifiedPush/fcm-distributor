@@ -1,4 +1,4 @@
-UnifiedPush provider using Google Services
+This is an <a href="https://unifiedpush.org/">UnifiedPush</a> Distributor that uses <a href="https://en.wikipedia.org/wiki/Firebase_Cloud_Messaging">FCM</a> („Firebase Cloud Messaging“ aka „Google Cloud Messaging“). It works out of the box, you don’t need to specify any server.
 
 This application is a service to provide push notifications to applications supporting UnifiedPush.
 
